@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, type RefObject } from "react";
 import { useSetDefaultScale } from "components/Resume/hooks";
 import {
   MagnifyingGlassIcon,
@@ -14,16 +14,19 @@ const ResumeControlBar = ({
   documentSize,
   document,
   fileName,
+  previewContainerRef,
 }: {
   scale: number;
   setScale: (scale: number) => void;
   documentSize: string;
   document: JSX.Element;
   fileName: string;
+  previewContainerRef?: RefObject<HTMLElement>;
 }) => {
   const { scaleOnResize, setScaleOnResize } = useSetDefaultScale({
     setScale,
     documentSize,
+    containerRef: previewContainerRef,
   });
 
   const [instance, update] = usePDF({ document });

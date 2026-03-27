@@ -1,4 +1,9 @@
 import { Page, View, Document } from "@react-pdf/renderer";
+import {
+  buildResumeLayout,
+  toPt,
+  type ResumeLayout,
+} from "components/Resume/ResumePDF/layout";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import { ResumePDFProfile } from "components/Resume/ResumePDF/ResumePDFProfile";
 import { ResumePDFWorkExperience } from "components/Resume/ResumePDF/ResumePDFWorkExperience";
@@ -29,10 +34,12 @@ import { SuppressResumePDFErrorMessage } from "components/Resume/ResumePDF/commo
 export const ResumePDF = ({
   resume,
   settings,
+  layout,
   isPDF = false,
 }: {
   resume: Resume;
   settings: Settings;
+  layout?: ResumeLayout;
   isPDF?: boolean;
 }) => {
   const { profile, workExperiences, educations, projects, skills, custom } =
@@ -48,6 +55,7 @@ export const ResumePDF = ({
     showBulletPoints,
   } = settings;
   const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
+  const resolvedLayout = layout ?? buildResumeLayout({ fontSize });
 
   const showFormsOrder = formsOrder.filter((form) => formToShow[form]);
 
@@ -55,6 +63,7 @@ export const ResumePDF = ({
     workExperiences: () => (
       <ResumePDFWorkExperience
         heading={formToHeading["workExperiences"]}
+        layout={resolvedLayout}
         workExperiences={workExperiences}
         themeColor={themeColor}
       />
@@ -63,6 +72,7 @@ export const ResumePDF = ({
       <ResumePDFEducation
         heading={formToHeading["educations"]}
         educations={educations}
+        layout={resolvedLayout}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["educations"]}
       />
@@ -70,6 +80,7 @@ export const ResumePDF = ({
     projects: () => (
       <ResumePDFProject
         heading={formToHeading["projects"]}
+        layout={resolvedLayout}
         projects={projects}
         themeColor={themeColor}
       />
@@ -77,6 +88,7 @@ export const ResumePDF = ({
     skills: () => (
       <ResumePDFSkills
         heading={formToHeading["skills"]}
+        layout={resolvedLayout}
         skills={skills}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["skills"]}
@@ -86,6 +98,7 @@ export const ResumePDF = ({
       <ResumePDFCustom
         heading={formToHeading["custom"]}
         custom={custom}
+        layout={resolvedLayout}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["custom"]}
       />
@@ -101,14 +114,14 @@ export const ResumePDF = ({
             ...styles.flexCol,
             color: DEFAULT_FONT_COLOR,
             fontFamily,
-            fontSize: fontSize + "pt",
+            fontSize: toPt(resolvedLayout.bodyFontSizePt),
           }}
         >
           {Boolean(settings.themeColor) && (
             <View
               style={{
                 width: spacing["full"],
-                height: spacing[3.5],
+                height: toPt(resolvedLayout.topAccentHeightPt),
                 backgroundColor: themeColor,
               }}
             />
@@ -116,10 +129,16 @@ export const ResumePDF = ({
           <View
             style={{
               ...styles.flexCol,
-              padding: `${spacing[0]} ${spacing[20]}`,
+              padding: `${toPt(resolvedLayout.pagePaddingTopPt)} ${toPt(
+                resolvedLayout.pagePaddingXPt
+              )} ${toPt(
+                resolvedLayout.pagePaddingBottomPt +
+                  resolvedLayout.autoFitBottomReservePt
+              )}`,
             }}
           >
             <ResumePDFProfile
+              layout={resolvedLayout}
               profile={profile}
               themeColor={themeColor}
               isPDF={isPDF}

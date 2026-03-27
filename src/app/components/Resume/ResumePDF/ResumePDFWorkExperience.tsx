@@ -4,27 +4,37 @@ import {
   ResumePDFBulletList,
   ResumePDFText,
 } from "components/Resume/ResumePDF/common";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import { toNegativePt, toPt, type ResumeLayout } from "components/Resume/ResumePDF/layout";
+import { styles } from "components/Resume/ResumePDF/styles";
 import type { ResumeWorkExperience } from "lib/redux/types";
 
 export const ResumePDFWorkExperience = ({
   heading,
+  layout,
   workExperiences,
   themeColor,
 }: {
   heading: string;
+  layout: ResumeLayout;
   workExperiences: ResumeWorkExperience[];
   themeColor: string;
 }) => {
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layout={layout}
+    >
       {workExperiences.map(({ company, jobTitle, date, descriptions }, idx) => {
         // Hide company name if it is the same as the previous company
         const hideCompanyName =
           idx > 0 && company === workExperiences[idx - 1].company;
 
         return (
-          <View key={idx} style={idx !== 0 ? { marginTop: spacing["2"] } : {}}>
+          <View
+            key={idx}
+            style={idx !== 0 ? { marginTop: toPt(layout.entryGapPt) } : {}}
+          >
             {!hideCompanyName && (
               <ResumePDFText bold={true}>{company}</ResumePDFText>
             )}
@@ -32,15 +42,15 @@ export const ResumePDFWorkExperience = ({
               style={{
                 ...styles.flexRowBetween,
                 marginTop: hideCompanyName
-                  ? "-" + spacing["1"]
-                  : spacing["1.5"],
+                  ? toNegativePt(layout.hiddenHeadingOffsetPt)
+                  : toPt(layout.subSectionGapPt),
               }}
             >
               <ResumePDFText>{jobTitle}</ResumePDFText>
               <ResumePDFText>{date}</ResumePDFText>
             </View>
-            <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
-              <ResumePDFBulletList items={descriptions} />
+            <View style={{ ...styles.flexCol, marginTop: toPt(layout.subSectionGapPt) }}>
+              <ResumePDFBulletList items={descriptions} layout={layout} />
             </View>
           </View>
         );

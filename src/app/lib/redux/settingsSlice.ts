@@ -6,6 +6,7 @@ export interface Settings {
   fontFamily: string;
   fontSize: string;
   documentSize: string;
+  autoFitOnePage: boolean;
   formToShow: {
     workExperiences: boolean;
     educations: boolean;
@@ -33,7 +34,11 @@ export type ShowForm = keyof Settings["formToShow"];
 export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
 export type GeneralSetting = Exclude<
   keyof Settings,
-  "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
+  | "autoFitOnePage"
+  | "formToShow"
+  | "formToHeading"
+  | "formsOrder"
+  | "showBulletPoints"
 >;
 
 export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
@@ -46,6 +51,7 @@ export const initialSettings: Settings = {
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
   documentSize: "Letter",
+  autoFitOnePage: false,
   formToShow: {
     workExperiences: true,
     educations: true,
@@ -79,6 +85,9 @@ export const settingsSlice = createSlice({
     ) => {
       const { field, value } = action.payload;
       draft[field] = value;
+    },
+    changeAutoFitOnePage: (draft, action: PayloadAction<boolean>) => {
+      draft.autoFitOnePage = action.payload;
     },
     changeShowForm: (
       draft,
@@ -129,6 +138,7 @@ export const settingsSlice = createSlice({
 
 export const {
   changeSettings,
+  changeAutoFitOnePage,
   changeShowForm,
   changeFormHeading,
   changeFormOrder,
@@ -138,6 +148,8 @@ export const {
 
 export const selectSettings = (state: RootState) => state.settings;
 export const selectThemeColor = (state: RootState) => state.settings.themeColor;
+export const selectAutoFitOnePage = (state: RootState) =>
+  state.settings.autoFitOnePage;
 
 export const selectFormToShow = (state: RootState) => state.settings.formToShow;
 export const selectShowByForm = (form: ShowForm) => (state: RootState) =>

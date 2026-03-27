@@ -3,19 +3,22 @@ import {
   ResumePDFIcon,
   type IconType,
 } from "components/Resume/ResumePDF/common/ResumePDFIcon";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import { styles } from "components/Resume/ResumePDF/styles";
 import {
   ResumePDFLink,
   ResumePDFSection,
   ResumePDFText,
 } from "components/Resume/ResumePDF/common";
+import { toPt, type ResumeLayout } from "components/Resume/ResumePDF/layout";
 import type { ResumeProfile } from "lib/redux/types";
 
 export const ResumePDFProfile = ({
+  layout,
   profile,
   themeColor,
   isPDF,
 }: {
+  layout: ResumeLayout;
   profile: ResumeProfile;
   themeColor: string;
   isPDF: boolean;
@@ -24,11 +27,14 @@ export const ResumePDFProfile = ({
   const iconProps = { email, phone, location, url };
 
   return (
-    <ResumePDFSection style={{ marginTop: spacing["4"] }}>
+    <ResumePDFSection
+      layout={layout}
+      style={{ marginTop: toPt(layout.profileMarginTopPt) }}
+    >
       <ResumePDFText
         bold={true}
         themeColor={themeColor}
-        style={{ fontSize: "20pt" }}
+        style={{ fontSize: toPt(layout.nameFontSizePt) }}
       >
         {name}
       </ResumePDFText>
@@ -37,7 +43,7 @@ export const ResumePDFProfile = ({
         style={{
           ...styles.flexRowBetween,
           flexWrap: "wrap",
-          marginTop: spacing["0.5"],
+          marginTop: toPt(layout.compactGapPt),
         }}
       >
         {Object.entries(iconProps).map(([key, value]) => {
@@ -84,10 +90,14 @@ export const ResumePDFProfile = ({
               style={{
                 ...styles.flexRow,
                 alignItems: "center",
-                gap: spacing["1"],
+                gap: toPt(layout.iconGapPt),
               }}
             >
-              <ResumePDFIcon type={iconType} isPDF={isPDF} />
+              <ResumePDFIcon
+                type={iconType}
+                isPDF={isPDF}
+                sizePt={layout.iconSizePt}
+              />
               <Wrapper>
                 <ResumePDFText>{value}</ResumePDFText>
               </Wrapper>

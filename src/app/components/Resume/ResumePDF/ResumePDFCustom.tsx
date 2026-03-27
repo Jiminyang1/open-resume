@@ -3,27 +3,35 @@ import {
   ResumePDFSection,
   ResumePDFBulletList,
 } from "components/Resume/ResumePDF/common";
+import { type ResumeLayout } from "components/Resume/ResumePDF/layout";
 import { styles } from "components/Resume/ResumePDF/styles";
 import type { ResumeCustom } from "lib/redux/types";
 
 export const ResumePDFCustom = ({
   heading,
   custom,
+  layout,
   themeColor,
   showBulletPoints,
 }: {
   heading: string;
   custom: ResumeCustom;
+  layout: ResumeLayout;
   themeColor: string;
   showBulletPoints: boolean;
 }) => {
   const { descriptions } = custom;
 
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layout={layout}
+    >
       <View style={{ ...styles.flexCol }}>
         <ResumePDFBulletList
           items={descriptions}
+          layout={layout}
           showBulletPoints={showBulletPoints}
         />
       </View>

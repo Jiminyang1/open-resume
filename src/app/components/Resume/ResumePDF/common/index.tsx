@@ -1,25 +1,31 @@
 import { Text, View, Link } from "@react-pdf/renderer";
 import type { Style } from "@react-pdf/types";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import {
+  toPt,
+  type ResumeLayout,
+} from "components/Resume/ResumePDF/layout";
+import { styles } from "components/Resume/ResumePDF/styles";
 import { DEBUG_RESUME_PDF_FLAG } from "lib/constants";
 import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 
 export const ResumePDFSection = ({
   themeColor,
   heading,
+  layout,
   style = {},
   children,
 }: {
   themeColor?: string;
   heading?: string;
+  layout: ResumeLayout;
   style?: Style;
   children: React.ReactNode;
 }) => (
   <View
     style={{
       ...styles.flexCol,
-      gap: spacing["2"],
-      marginTop: spacing["5"],
+      gap: toPt(layout.sectionGapPt),
+      marginTop: toPt(layout.sectionMarginTopPt),
       ...style,
     }}
   >
@@ -28,10 +34,10 @@ export const ResumePDFSection = ({
         {themeColor && (
           <View
             style={{
-              height: "3.75pt",
-              width: "30pt",
+              height: toPt(layout.headingAccentHeightPt),
+              width: toPt(layout.headingAccentWidthPt),
               backgroundColor: themeColor,
-              marginRight: spacing["3.5"],
+              marginRight: toPt(layout.headingAccentGapPt),
             }}
             debug={DEBUG_RESUME_PDF_FLAG}
           />
@@ -39,7 +45,7 @@ export const ResumePDFSection = ({
         <Text
           style={{
             fontWeight: "bold",
-            letterSpacing: "0.3pt", // tracking-wide -> 0.025em * 12 pt = 0.3pt
+            letterSpacing: toPt(layout.headingLetterSpacingPt),
           }}
           debug={DEBUG_RESUME_PDF_FLAG}
         >
@@ -78,9 +84,11 @@ export const ResumePDFText = ({
 
 export const ResumePDFBulletList = ({
   items,
+  layout,
   showBulletPoints = true,
 }: {
   items: string[];
+  layout: ResumeLayout;
   showBulletPoints?: boolean;
 }) => {
   return (
@@ -90,9 +98,9 @@ export const ResumePDFBulletList = ({
           {showBulletPoints && (
             <ResumePDFText
               style={{
-                paddingLeft: spacing["2"],
-                paddingRight: spacing["2"],
-                lineHeight: "1.3",
+                paddingLeft: toPt(layout.bulletPaddingXPt),
+                paddingRight: toPt(layout.bulletPaddingXPt),
+                lineHeight: layout.lineHeight,
               }}
               bold={true}
             >
@@ -102,7 +110,7 @@ export const ResumePDFBulletList = ({
           {/* A breaking change was introduced causing text layout to be wider than node's width
               https://github.com/diegomura/react-pdf/issues/2182. flexGrow & flexBasis fixes it */}
           <ResumePDFText
-            style={{ lineHeight: "1.3", flexGrow: 1, flexBasis: 0 }}
+            style={{ lineHeight: layout.lineHeight, flexGrow: 1, flexBasis: 0 }}
           >
             {item}
           </ResumePDFText>
@@ -141,11 +149,13 @@ export const ResumePDFLink = ({
 };
 
 export const ResumeFeaturedSkill = ({
+  layout,
   skill,
   rating,
   themeColor,
   style = {},
 }: {
+  layout: ResumeLayout;
   skill: string;
   rating: number;
   themeColor: string;
@@ -155,16 +165,18 @@ export const ResumeFeaturedSkill = ({
 
   return (
     <View style={{ ...styles.flexRow, alignItems: "center", ...style }}>
-      <ResumePDFText style={{ marginRight: spacing[0.5] }}>
+      <ResumePDFText
+        style={{ marginRight: toPt(layout.featuredSkillLabelGapPt) }}
+      >
         {skill}
       </ResumePDFText>
       {[...Array(numCircles)].map((_, idx) => (
         <View
           key={idx}
           style={{
-            height: "9pt",
-            width: "9pt",
-            marginLeft: "2.25pt",
+            height: toPt(layout.featuredSkillDotSizePt),
+            width: toPt(layout.featuredSkillDotSizePt),
+            marginLeft: toPt(layout.featuredSkillDotGapPt),
             backgroundColor: rating >= idx ? themeColor : "#d9d9d9",
             borderRadius: "100%",
           }}

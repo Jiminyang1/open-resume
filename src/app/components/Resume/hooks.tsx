@@ -1,26 +1,46 @@
 import { useEffect, useState } from "react";
-import { A4_HEIGHT_PX, LETTER_HEIGHT_PX } from "lib/constants";
+import type { RefObject } from "react";
 import { getPxPerRem } from "lib/get-px-per-rem";
 import { CSS_VARIABLES } from "globals-css";
+import { getDefaultResumeScale } from "components/Resume/scale";
 
 /**
  * useSetDefaultScale sets the default scale of the resume on load.
  *
- * It computes the scale based on current screen height and derives the default
- * resume height by subtracting the screen height from the total heights of top
- * nav bar, resume control bar, and resume top & bottom padding.
+ * It computes the scale by fitting the physical page within the available
+ * preview height and width, so narrow layouts don't get clipped horizontally.
  */
 export const useSetDefaultScale = ({
   setScale,
   documentSize,
+  containerRef,
 }: {
   setScale: (scale: number) => void;
   documentSize: string;
+  containerRef?: RefObject<HTMLElement>;
 }) => {
   const [scaleOnResize, setScaleOnResize] = useState(true);
 
   useEffect(() => {
     const getDefaultScale = () => {
+      const container = containerRef?.current;
+
+      if (container) {
+        const computedStyle = window.getComputedStyle(container);
+        const horizontalPaddingPx =
+          parseFloat(computedStyle.paddingLeft) +
+          parseFloat(computedStyle.paddingRight);
+        const verticalPaddingPx =
+          parseFloat(computedStyle.paddingTop) +
+          parseFloat(computedStyle.paddingBottom);
+
+        return getDefaultResumeScale({
+          documentSize,
+          availableHeightPx: container.clientHeight - verticalPaddingPx,
+          availableWidthPx: container.clientWidth - horizontalPaddingPx,
+        });
+      }
+
       const screenHeightPx = window.innerHeight;
       const PX_PER_REM = getPxPerRem();
       const screenHeightRem = screenHeightPx / PX_PER_REM;
@@ -31,16 +51,16 @@ export const useSetDefaultScale = ({
         CSS_VARIABLES["--resume-control-bar-height"]
       );
       const resumePadding = parseFloat(CSS_VARIABLES["--resume-padding"]);
-      const topAndBottomResumePadding = resumePadding * 2;
-      const defaultResumeHeightRem =
-        screenHeightRem -
-        topNavBarHeightRem -
-        resumeControlBarHeight -
-        topAndBottomResumePadding;
-      const resumeHeightPx = defaultResumeHeightRem * PX_PER_REM;
-      const height = documentSize === "A4" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
-      const defaultScale = Math.round((resumeHeightPx / height) * 100) / 100;
-      return defaultScale;
+      const topAndBottomResumePadding = resumePadding * 2 * PX_PER_REM;
+
+      return getDefaultResumeScale({
+        documentSize,
+        availableHeightPx:
+          screenHeightPx -
+          (topNavBarHeightRem + resumeControlBarHeight) * PX_PER_REM -
+          topAndBottomResumePadding,
+        availableWidthPx: window.innerWidth,
+      });
     };
 
     const setDefaultScale = () => {
@@ -56,7 +76,7 @@ export const useSetDefaultScale = ({
     return () => {
       window.removeEventListener("resize", setDefaultScale);
     };
-  }, [setScale, scaleOnResize, documentSize]);
+  }, [containerRef, setScale, scaleOnResize, documentSize]);
 
   return { scaleOnResize, setScaleOnResize };
 };

@@ -4,16 +4,19 @@ import {
   ResumePDFBulletList,
   ResumeFeaturedSkill,
 } from "components/Resume/ResumePDF/common";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import { toPt, type ResumeLayout } from "components/Resume/ResumePDF/layout";
+import { styles } from "components/Resume/ResumePDF/styles";
 import type { ResumeSkills } from "lib/redux/types";
 
 export const ResumePDFSkills = ({
   heading,
+  layout,
   skills,
   themeColor,
   showBulletPoints,
 }: {
   heading: string;
+  layout: ResumeLayout;
   skills: ResumeSkills;
   themeColor: string;
   showBulletPoints: boolean;
@@ -27,9 +30,18 @@ export const ResumePDFSkills = ({
   ];
 
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layout={layout}
+    >
       {featuredSkillsWithText.length > 0 && (
-        <View style={{ ...styles.flexRowBetween, marginTop: spacing["0.5"] }}>
+        <View
+          style={{
+            ...styles.flexRowBetween,
+            marginTop: toPt(layout.compactGapPt),
+          }}
+        >
           {featuredSkillsPair.map((pair, idx) => (
             <View
               key={idx}
@@ -42,6 +54,7 @@ export const ResumePDFSkills = ({
                 return (
                   <ResumeFeaturedSkill
                     key={idx}
+                    layout={layout}
                     skill={featuredSkill.skill}
                     rating={featuredSkill.rating}
                     themeColor={themeColor}
@@ -58,6 +71,7 @@ export const ResumePDFSkills = ({
       <View style={{ ...styles.flexCol }}>
         <ResumePDFBulletList
           items={descriptions}
+          layout={layout}
           showBulletPoints={showBulletPoints}
         />
       </View>

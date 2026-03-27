@@ -4,22 +4,29 @@ import {
   ResumePDFSection,
   ResumePDFText,
 } from "components/Resume/ResumePDF/common";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import { toNegativePt, toPt, type ResumeLayout } from "components/Resume/ResumePDF/layout";
+import { styles } from "components/Resume/ResumePDF/styles";
 import type { ResumeEducation } from "lib/redux/types";
 
 export const ResumePDFEducation = ({
   heading,
   educations,
+  layout,
   themeColor,
   showBulletPoints,
 }: {
   heading: string;
   educations: ResumeEducation[];
+  layout: ResumeLayout;
   themeColor: string;
   showBulletPoints: boolean;
 }) => {
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layout={layout}
+    >
       {educations.map(
         ({ school, degree, date, gpa, descriptions = [] }, idx) => {
           // Hide school name if it is the same as the previous school
@@ -36,8 +43,8 @@ export const ResumePDFEducation = ({
                 style={{
                   ...styles.flexRowBetween,
                   marginTop: hideSchoolName
-                    ? "-" + spacing["1"]
-                    : spacing["1.5"],
+                    ? toNegativePt(layout.hiddenHeadingOffsetPt)
+                    : toPt(layout.subSectionGapPt),
                 }}
               >
                 <ResumePDFText>{`${
@@ -48,9 +55,15 @@ export const ResumePDFEducation = ({
                 <ResumePDFText>{date}</ResumePDFText>
               </View>
               {showDescriptions && (
-                <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
+                <View
+                  style={{
+                    ...styles.flexCol,
+                    marginTop: toPt(layout.subSectionGapPt),
+                  }}
+                >
                   <ResumePDFBulletList
                     items={descriptions}
+                    layout={layout}
                     showBulletPoints={showBulletPoints}
                   />
                 </View>
