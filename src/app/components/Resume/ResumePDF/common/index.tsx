@@ -5,6 +5,7 @@ import {
   type ResumeLayout,
 } from "components/Resume/ResumePDF/layout";
 import { styles } from "components/Resume/ResumePDF/styles";
+import { getRichTextSegmentsFromMarkdown } from "lib/bullet-list-rich-text";
 import { DEBUG_RESUME_PDF_FLAG } from "lib/constants";
 import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 
@@ -112,7 +113,14 @@ export const ResumePDFBulletList = ({
           <ResumePDFText
             style={{ lineHeight: layout.lineHeight, flexGrow: 1, flexBasis: 0 }}
           >
-            {item}
+            {getRichTextSegmentsFromMarkdown(item).map((segment, segmentIdx) => (
+              <Text
+                key={`${idx}-${segmentIdx}`}
+                style={{ fontWeight: segment.bold ? "bold" : "normal" }}
+              >
+                {segment.text}
+              </Text>
+            ))}
           </ResumePDFText>
         </View>
       ))}

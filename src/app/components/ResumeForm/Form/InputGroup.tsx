@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import ContentEditable from "react-contenteditable";
 import { useAutosizeTextareaHeight } from "lib/hooks/useAutosizeTextareaHeight";
+import {
+  getBulletListStringsFromHTML,
+  getHTMLFromBulletListStrings,
+} from "lib/bullet-list-rich-text";
 
 interface InputProps<K extends string, V extends string | string[]> {
   label: string;
@@ -131,11 +135,16 @@ const BulletListTextareaGeneral = <T extends string>({
         }`}
         // Note: placeholder currently doesn't work
         placeholder={placeholder}
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+            e.preventDefault();
+            document.execCommand("bold");
+          }
+        }}
         onChange={(e) => {
           if (e.type === "input") {
-            const { innerText } = e.currentTarget as HTMLDivElement;
-            const newBulletListStrings =
-              getBulletListStringsFromInnerText(innerText);
+            const { innerHTML } = e.currentTarget as HTMLDivElement;
+            const newBulletListStrings = getBulletListStringsFromHTML(innerHTML);
             onChange(name, newBulletListStrings);
           }
         }}
@@ -157,30 +166,6 @@ const normalizeLineBreak = (str: string) =>
 const dedupeLineBreak = (str: string) =>
   str.replace(/\n\n/g, NORMALIZED_LINE_BREAK);
 const getStringsByLineBreak = (str: string) => str.split(NORMALIZED_LINE_BREAK);
-
-const getBulletListStringsFromInnerText = (innerText: string) => {
-  const innerTextWithNormalizedLineBreak = normalizeLineBreak(innerText);
-
-  // In Windows Chrome, pressing enter creates 2 line breaks "\n\n"
-  // This dedupes it into 1 line break "\n"
-  let newInnerText = dedupeLineBreak(innerTextWithNormalizedLineBreak);
-
-  // Handle the special case when content is empty
-  if (newInnerText === NORMALIZED_LINE_BREAK) {
-    newInnerText = "";
-  }
-
-  return getStringsByLineBreak(newInnerText);
-};
-
-const getHTMLFromBulletListStrings = (bulletListStrings: string[]) => {
-  // If bulletListStrings is an empty array, make it an empty div
-  if (bulletListStrings.length === 0) {
-    return "<div></div>";
-  }
-
-  return bulletListStrings.map((text) => `<div>${text}</div>`).join("");
-};
 
 /**
  * BulletListTextareaFallback is a fallback for BulletListTextareaGeneral to work around
