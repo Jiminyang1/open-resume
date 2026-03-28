@@ -38,7 +38,7 @@ export const ResumePDFProfile = ({
       >
         {name}
       </ResumePDFText>
-      {summary && <ResumePDFText>{summary}</ResumePDFText>}
+      {Boolean(summary) ? <ResumePDFText>{summary}</ResumePDFText> : null}
       <View
         style={{
           ...styles.flexRowBetween,

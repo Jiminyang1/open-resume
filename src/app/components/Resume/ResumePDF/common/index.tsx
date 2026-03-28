@@ -30,9 +30,9 @@ export const ResumePDFSection = ({
       ...style,
     }}
   >
-    {heading && (
+    {Boolean(heading) ? (
       <View style={{ ...styles.flexRow, alignItems: "center" }}>
-        {themeColor && (
+        {Boolean(themeColor) ? (
           <View
             style={{
               height: toPt(layout.headingAccentHeightPt),
@@ -42,7 +42,7 @@ export const ResumePDFSection = ({
             }}
             debug={DEBUG_RESUME_PDF_FLAG}
           />
-        )}
+        ) : null}
         <Text
           style={{
             fontWeight: "bold",
@@ -53,7 +53,7 @@ export const ResumePDFSection = ({
           {heading}
         </Text>
       </View>
-    )}
+    ) : null}
     {children}
   </View>
 );
