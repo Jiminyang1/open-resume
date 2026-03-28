@@ -11,8 +11,8 @@ export const END_HOME_RESUME: Resume = {
   profile: {
     name: "John Doe",
     summary:
-      "Product engineer focused on shipping simple tools that are genuinely useful",
-    email: "hello@openresumeplus.com",
+      "Software engineer obsessed with building exceptional products that people love",
+    email: "hello@openresume.com",
     phone: "123-456-7890",
     location: "NYC, NY",
     url: "linkedin.com/in/john-doe",
@@ -63,10 +63,10 @@ export const END_HOME_RESUME: Resume = {
   ],
   projects: [
     {
-      project: "Open Resume Plus",
-      date: "2026",
+      project: "OpenResume",
+      date: "Spring 2023",
       descriptions: [
-        "Evolved an open-source resume builder into a more focused product experience while keeping the project transparent and community-friendly",
+        "Created and launched a free resume builder web app that allows thousands of users to create professional resume easily and land their dream jobs",
       ],
     },
   ],

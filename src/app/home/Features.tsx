@@ -1,56 +1,59 @@
-import Link from "next/link";
+import Image from "next/image";
+import featureFreeSrc from "public/assets/feature-free.svg";
+import featureUSSrc from "public/assets/feature-us.svg";
+import featurePrivacySrc from "public/assets/feature-privacy.svg";
+import featureOpenSourceSrc from "public/assets/feature-open-source.svg";
+import { Link } from "components/documentation";
 
 const FEATURES = [
   {
-    title: "Built in the open",
+    src: featureFreeSrc,
+    title: "Free Forever",
+    text: "OpenResume is created with the belief that everyone should have free and easy access to a modern professional resume design",
+  },
+  {
+    src: featureUSSrc,
+    title: "U.S. Best Practices",
+    text: "OpenResume has built-in best practices for the U.S. job market and works well with top ATS platforms such as Greenhouse and Lever",
+  },
+  {
+    src: featurePrivacySrc,
+    title: "Privacy Focus",
+    text: "OpenResume stores data locally in your browser so only you have access to your data and with complete control",
+  },
+  {
+    src: featureOpenSourceSrc,
+    title: "Open-Source",
     text: (
       <>
-        Open Resume Plus stays open-source and explicitly acknowledges the{" "}
-        <Link
-          href="https://github.com/xitanggg/open-resume"
-          target="_blank"
-          rel="noreferrer"
-          className="font-medium underline underline-offset-2"
-        >
-          OpenResume
-        </Link>{" "}
-        foundation it was built on.
+        OpenResume is an open-source project, and its source code can be viewed
+        by anyone on its{" "}
+        <Link href="https://github.com/xitanggg/open-resume">
+          GitHub repository
+        </Link>
       </>
     ),
-  },
-  {
-    title: "Local-first workflow",
-    text: "Resume data stays in the browser-first flow, which keeps iteration fast and reduces friction for users who just want to edit and export.",
-  },
-  {
-    title: "Product-minded simplicity",
-    text: "The homepage now focuses on the core paths only: build, import, and parse, without the extra marketing clutter from the original landing page.",
-  },
-  {
-    title: "Ready to keep evolving",
-    text: "This fork is positioned as an actively maintained product direction, so branding and copy can keep changing while the attribution remains clear.",
   },
 ];
 
 export const Features = () => {
   return (
-    <section className="py-14 lg:py-20">
-      <div className="mx-auto max-w-5xl">
-        <div className="max-w-2xl">
-          <h2 className="text-3xl font-bold">A smaller, clearer homepage</h2>
-          <p className="mt-3 leading-7 text-gray-600">
-            Open Resume Plus keeps the original spirit of utility and openness,
-            while presenting the product in a more focused way.
-          </p>
-        </div>
-        <dl className="mt-8 grid gap-4 lg:grid-cols-2">
-          {FEATURES.map(({ title, text }) => (
-            <div
-              className="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm"
-              key={title}
-            >
-              <dt className="text-xl font-bold">{title}</dt>
-              <dd className="mt-3 leading-7 text-gray-600">{text}</dd>
+    <section className="py-16 lg:py-36">
+      <div className="mx-auto lg:max-w-4xl">
+        <dl className="grid grid-cols-1 justify-items-center gap-y-8 lg:grid-cols-2 lg:gap-x-6 lg:gap-y-16">
+          {FEATURES.map(({ src, title, text }) => (
+            <div className="px-2" key={title}>
+              <div className="relative w-96 self-center pl-16">
+                <dt className="text-2xl font-bold">
+                  <Image
+                    src={src}
+                    className="absolute left-0 top-1 h-12 w-12"
+                    alt="Feature icon"
+                  />
+                  {title}
+                </dt>
+                <dd className="mt-2">{text}</dd>
+              </div>
             </div>
           ))}
         </dl>

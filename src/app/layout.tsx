@@ -3,13 +3,9 @@ import { TopNavBar } from "components/TopNavBar";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
-  title: "Open Resume Plus - Open-source Resume Builder and Parser",
+  title: "OpenResume - Free Open-source Resume Builder and Parser",
   description:
-    "Open Resume Plus is an open-source resume builder and parser, evolved from OpenResume and streamlined into a more focused product experience.",
-  icons: {
-    icon: "/favicon.ico?v=3",
-    shortcut: "/favicon.ico?v=3",
-  },
+    "OpenResume is a free, open-source, and powerful resume builder that allows anyone to create a modern professional resume in 3 simple steps. For those who have an existing resume, OpenResume also provides a resume parser to help test and confirm its ATS readability.",
 };
 
 export default function RootLayout({
