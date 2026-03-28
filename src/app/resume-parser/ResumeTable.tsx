@@ -48,14 +48,6 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
       ? [deepClone(initialWorkExperience)]
       : resume.workExperiences;
   const skills = [...resume.skills.descriptions];
-  const featuredSkills = resume.skills.featuredSkills
-    .filter((item) => item.skill.trim())
-    .map((item) => item.skill)
-    .join(", ")
-    .trim();
-  if (featuredSkills) {
-    skills.unshift(featuredSkills);
-  }
   return (
     <table className="mt-2 w-full border text-sm text-gray-900">
       <tbody className="divide-y text-left align-top">

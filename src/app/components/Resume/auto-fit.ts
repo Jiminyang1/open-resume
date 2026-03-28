@@ -1,5 +1,3 @@
-import { MIN_BODY_FONT_SIZE_PT } from "components/Resume/ResumePDF/layout";
-
 export type AutoFitStatus =
   | "disabled"
   | "applied"
@@ -14,10 +12,8 @@ const FINAL_SCALE_BACKOFF_STEP = 0.005;
 
 const roundScale = (value: number) => Math.round(value * 1000) / 1000;
 
-export const getAutoFitScaleBounds = (baseBodyFontSizePt: number) => ({
-  minScale: roundScale(
-    Math.min(BASE_LAYOUT_SCALE, MIN_BODY_FONT_SIZE_PT / baseBodyFontSizePt)
-  ),
+export const getAutoFitScaleBounds = () => ({
+  minScale: roundScale(MIN_LAYOUT_SCALE),
   maxScale: BASE_LAYOUT_SCALE,
 });
 

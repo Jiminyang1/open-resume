@@ -2,6 +2,14 @@ import * as pdfjs from "pdfjs-dist";
 import { findLastInkRow } from "lib/pdf-page-metrics";
 
 const PDF_RENDER_SCALE = 2;
+let hasConfiguredPdfJsWorker = false;
+
+const configurePdfJsWorker = () => {
+  if (hasConfiguredPdfJsWorker || typeof window === "undefined") return;
+
+  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+  hasConfiguredPdfJsWorker = true;
+};
 
 const roundTo = (value: number, digits = 2) => {
   const factor = 10 ** digits;
@@ -9,12 +17,9 @@ const roundTo = (value: number, digits = 2) => {
 };
 
 const loadPdfDocument = async (blob: Blob) => {
+  configurePdfJsWorker();
   const data = new Uint8Array(await blob.arrayBuffer());
-  return pdfjs.getDocument({
-    data,
-    // pdfjs-dist supports disableWorker at runtime, but the bundled typings lag behind.
-    disableWorker: true,
-  } as any).promise;
+  return pdfjs.getDocument({ data }).promise;
 };
 
 export const getPdfPageMetrics = async (blob: Blob) => {

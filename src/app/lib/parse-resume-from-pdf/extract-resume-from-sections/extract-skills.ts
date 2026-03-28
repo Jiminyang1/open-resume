@@ -1,8 +1,6 @@
 import type { ResumeSkills } from "lib/redux/types";
 import type { ResumeSectionToLines } from "lib/parse-resume-from-pdf/types";
-import { deepClone } from "lib/deep-clone";
 import { getSectionLinesByKeywords } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/get-section-lines";
-import { initialFeaturedSkills } from "lib/redux/resumeSlice";
 import {
   getBulletPointsFromLines,
   getDescriptionsLineIdx,
@@ -10,24 +8,22 @@ import {
 
 export const extractSkills = (sections: ResumeSectionToLines) => {
   const lines = getSectionLinesByKeywords(sections, ["skill"]);
-  const descriptionsLineIdx = getDescriptionsLineIdx(lines) ?? 0;
-  const descriptionsLines = lines.slice(descriptionsLineIdx);
-  const descriptions = getBulletPointsFromLines(descriptionsLines);
-
-  const featuredSkills = deepClone(initialFeaturedSkills);
-  if (descriptionsLineIdx !== 0) {
-    const featuredSkillsLines = lines.slice(0, descriptionsLineIdx);
-    const featuredSkillsTextItems = featuredSkillsLines
-      .flat()
-      .filter((item) => item.text.trim())
-      .slice(0, 6);
-    for (let i = 0; i < featuredSkillsTextItems.length; i++) {
-      featuredSkills[i].skill = featuredSkillsTextItems[i].text;
-    }
-  }
+  const descriptionsLineIdx = getDescriptionsLineIdx(lines);
+  const leadingDescriptions =
+    descriptionsLineIdx === undefined
+      ? []
+      : lines
+          .slice(0, descriptionsLineIdx)
+          .map((line) => line.map((item) => item.text).join(" ").trim())
+          .filter(Boolean);
+  const descriptionsLines =
+    descriptionsLineIdx === undefined ? lines : lines.slice(descriptionsLineIdx);
+  const descriptions = [
+    ...leadingDescriptions,
+    ...getBulletPointsFromLines(descriptionsLines),
+  ];
 
   const skills: ResumeSkills = {
-    featuredSkills,
     descriptions,
   };
 

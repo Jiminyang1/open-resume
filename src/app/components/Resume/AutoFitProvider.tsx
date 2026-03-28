@@ -17,6 +17,7 @@ import {
   useRegisterReactPDFHyphenationCallback,
 } from "components/fonts/hooks";
 import {
+  type AutoFitStatus,
   findBestFitScale,
   getAutoFitScaleBounds,
 } from "components/Resume/auto-fit";
@@ -60,9 +61,7 @@ export const AutoFitProvider = ({ children }: { children: React.ReactNode }) => 
 
     const timeoutId = window.setTimeout(async () => {
       try {
-        const { minScale, maxScale } = getAutoFitScaleBounds(
-          manualLayout.bodyFontSizePt
-        );
+        const { minScale, maxScale } = getAutoFitScaleBounds();
 
         const measurePageCount = async (fitScale: number) => {
           const candidateLayout = buildResumeLayout({

@@ -1,5 +1,6 @@
 export const MIN_BODY_FONT_SIZE_PT = 9.5;
 export const MAX_BODY_FONT_SIZE_PT = 12;
+export const MAX_MANUAL_BODY_FONT_SIZE_PT = 72;
 export const DEFAULT_LAYOUT_SCALE = 1;
 const DEFAULT_BODY_FONT_SIZE_PT = 11;
 
@@ -59,9 +60,6 @@ export type ResumeLayout = {
   lineHeight: number;
   iconGapPt: number;
   iconSizePt: number;
-  featuredSkillDotSizePt: number;
-  featuredSkillDotGapPt: number;
-  featuredSkillLabelGapPt: number;
 };
 
 const AUTO_FIT_PAGE_PADDING_TOP_BASE_PT = 6;
@@ -88,9 +86,6 @@ const BASE_RESUME_LAYOUT = {
   lineHeight: 1.3,
   iconGapPt: 3,
   iconSizePt: 13,
-  featuredSkillDotSizePt: 9,
-  featuredSkillDotGapPt: 2.25,
-  featuredSkillLabelGapPt: 1.5,
 } as const;
 
 const AUTO_FIT_LAYOUT_LIMITS = {
@@ -115,20 +110,25 @@ const AUTO_FIT_LAYOUT_LIMITS = {
   lineHeight: { min: 1.18, max: 1.35 },
   iconGapPt: { min: 2, max: 4 },
   iconSizePt: { min: 11, max: 14.5 },
-  featuredSkillDotSizePt: { min: 7, max: 10 },
-  featuredSkillDotGapPt: { min: 1.5, max: 3 },
-  featuredSkillLabelGapPt: { min: 1, max: 2 },
 } as const;
 
 export const toPt = (value: number) => `${roundTo(value, 2)}pt`;
 export const toNegativePt = (value: number) => `-${toPt(value)}`;
 
-export const getBaseBodyFontSizePt = (fontSize: string) => {
+export const getBaseBodyFontSizePt = (
+  fontSize: string,
+  {
+    maxBodyFontSizePt = Number.POSITIVE_INFINITY,
+  }: {
+    maxBodyFontSizePt?: number;
+  } = {}
+) => {
   const parsedFontSize = Number(fontSize);
   if (!Number.isFinite(parsedFontSize) || parsedFontSize <= 0) {
     return DEFAULT_BODY_FONT_SIZE_PT;
   }
-  return roundTo(Math.min(parsedFontSize, MAX_BODY_FONT_SIZE_PT), 2);
+
+  return roundTo(Math.min(parsedFontSize, maxBodyFontSizePt), 2);
 };
 
 export const buildResumeLayout = ({
@@ -140,7 +140,9 @@ export const buildResumeLayout = ({
   fitScale?: number;
   enforceAtsBoundaries?: boolean;
 }): ResumeLayout => {
-  const baseBodyFontSizePt = getBaseBodyFontSizePt(fontSize);
+  const baseBodyFontSizePt = getBaseBodyFontSizePt(fontSize, {
+    maxBodyFontSizePt: MAX_MANUAL_BODY_FONT_SIZE_PT,
+  });
   const scaledBodyFontSize = baseBodyFontSizePt * fitScale;
   const verticalPagePaddingTopPt = enforceAtsBoundaries
     ? AUTO_FIT_PAGE_PADDING_TOP_BASE_PT
@@ -148,12 +150,7 @@ export const buildResumeLayout = ({
   const verticalPagePaddingBottomPt = enforceAtsBoundaries
     ? AUTO_FIT_PAGE_PADDING_BOTTOM_BASE_PT
     : 0;
-  const bodyFontSizePt = enforceAtsBoundaries
-    ? roundTo(
-        clamp(scaledBodyFontSize, MIN_BODY_FONT_SIZE_PT, MAX_BODY_FONT_SIZE_PT),
-        2
-      )
-    : roundTo(scaledBodyFontSize, 2);
+  const bodyFontSizePt = roundTo(scaledBodyFontSize, 2);
 
   return {
     fitScale: roundTo(fitScale, 3),
@@ -286,24 +283,6 @@ export const buildResumeLayout = ({
       fitScale,
       enforceBounds: enforceAtsBoundaries,
       ...AUTO_FIT_LAYOUT_LIMITS.iconSizePt,
-    }),
-    featuredSkillDotSizePt: scaleToken({
-      base: BASE_RESUME_LAYOUT.featuredSkillDotSizePt,
-      fitScale,
-      enforceBounds: enforceAtsBoundaries,
-      ...AUTO_FIT_LAYOUT_LIMITS.featuredSkillDotSizePt,
-    }),
-    featuredSkillDotGapPt: scaleToken({
-      base: BASE_RESUME_LAYOUT.featuredSkillDotGapPt,
-      fitScale,
-      enforceBounds: enforceAtsBoundaries,
-      ...AUTO_FIT_LAYOUT_LIMITS.featuredSkillDotGapPt,
-    }),
-    featuredSkillLabelGapPt: scaleToken({
-      base: BASE_RESUME_LAYOUT.featuredSkillLabelGapPt,
-      fitScale,
-      enforceBounds: enforceAtsBoundaries,
-      ...AUTO_FIT_LAYOUT_LIMITS.featuredSkillLabelGapPt,
     }),
   };
 };

@@ -12,12 +12,14 @@ const Selection = ({
   selectedColor,
   isSelected,
   style = {},
+  interactive = true,
   onClick,
   children,
 }: {
   selectedColor: string;
   isSelected: boolean;
   style?: React.CSSProperties;
+  interactive?: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) => {
@@ -30,13 +32,17 @@ const Selection = ({
 
   return (
     <div
-      className="flex w-[105px] cursor-pointer items-center justify-center rounded-md border border-gray-300 py-1.5 shadow-sm hover:border-gray-400 hover:bg-gray-100"
-      onClick={onClick}
+      className={`flex w-[105px] items-center justify-center rounded-md border border-gray-300 py-1.5 shadow-sm ${
+        interactive
+          ? "cursor-pointer hover:border-gray-400 hover:bg-gray-100"
+          : "cursor-default"
+      }`}
+      onClick={() => interactive && onClick()}
       style={isSelected ? selectedStyle : style}
       onKeyDown={(e) => {
-        if (["Enter", " "].includes(e.key)) onClick();
+        if (interactive && ["Enter", " "].includes(e.key)) onClick();
       }}
-      tabIndex={0}
+      tabIndex={interactive ? 0 : -1}
     >
       {children}
     </div>
@@ -105,11 +111,17 @@ export const FontSizeSelections = ({
 }) => {
   const standardSizePt = FONT_FAMILY_TO_STANDARD_SIZE_IN_PT[fontFamily];
   const compactSizePt = standardSizePt - 1;
+  const presetOptions = ["Compact", "Standard", "Large"].map((type, idx) => ({
+    type,
+    fontSizePt: String(compactSizePt + idx),
+  }));
+  const isCustomSelected = !presetOptions.some(
+    ({ fontSizePt }) => fontSizePt === selectedFontSize
+  );
 
   return (
     <SelectionsWrapper>
-      {["Compact", "Standard", "Large"].map((type, idx) => {
-        const fontSizePt = String(compactSizePt + idx);
+      {presetOptions.map(({ type, fontSizePt }, idx) => {
         const isSelected = fontSizePt === selectedFontSize;
         return (
           <Selection
@@ -126,6 +138,21 @@ export const FontSizeSelections = ({
           </Selection>
         );
       })}
+      {isCustomSelected && (
+        <Selection
+          selectedColor={themeColor}
+          isSelected={true}
+          interactive={false}
+          onClick={() => {}}
+        >
+          <div className="flex flex-col items-center leading-tight">
+            <div>Custom</div>
+            <div className="mt-1 text-xs font-medium text-white/85">
+              {selectedFontSize}pt
+            </div>
+          </div>
+        </Selection>
+      )}
     </SelectionsWrapper>
   );
 };

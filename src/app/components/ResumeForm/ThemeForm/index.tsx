@@ -1,11 +1,13 @@
+import { useEffect, useState } from "react";
 import { useAutoFitContext } from "components/Resume/AutoFitContext";
 import {
   getBaseBodyFontSizePt,
+  MIN_BODY_FONT_SIZE_PT,
   MAX_BODY_FONT_SIZE_PT,
+  MAX_MANUAL_BODY_FONT_SIZE_PT,
 } from "components/Resume/ResumePDF/layout";
 import { BaseForm } from "components/ResumeForm/Form";
 import { InputGroupWrapper } from "components/ResumeForm/Form/InputGroup";
-import { THEME_COLORS } from "components/ResumeForm/ThemeForm/constants";
 import { InlineInput } from "components/ResumeForm/ThemeForm/InlineInput";
 import {
   DocumentSizeSelections,
@@ -23,12 +25,23 @@ import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import type { FontFamily } from "components/fonts/constants";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
+const HEX_COLOR_PATTERN = /^#(?:[0-9a-fA-F]{6})$/;
+
 const formatFontSizePt = (value: number) => {
   const roundedValue = Math.round(value * 100) / 100;
   return Number.isInteger(roundedValue)
     ? String(roundedValue)
     : roundedValue.toFixed(2).replace(/\.?0+$/, "");
 };
+
+const normalizeThemeColor = (value?: string) => {
+  if (!value) return DEFAULT_THEME_COLOR;
+  return HEX_COLOR_PATTERN.test(value) ? value : DEFAULT_THEME_COLOR;
+};
+
+const RECOMMENDED_ATS_FONT_SIZE_RANGE_LABEL = `${formatFontSizePt(
+  MIN_BODY_FONT_SIZE_PT
+)}-${formatFontSizePt(MAX_BODY_FONT_SIZE_PT)}pt`;
 
 const normalizeFontSizeInput = (value: string) => {
   if (value.trim() === "") return value;
@@ -38,29 +51,58 @@ const normalizeFontSizeInput = (value: string) => {
     return value;
   }
 
-  return parsedValue > MAX_BODY_FONT_SIZE_PT
-    ? String(MAX_BODY_FONT_SIZE_PT)
+  return parsedValue > MAX_MANUAL_BODY_FONT_SIZE_PT
+    ? String(MAX_MANUAL_BODY_FONT_SIZE_PT)
     : value;
 };
 
 export const ThemeForm = () => {
   const settings = useAppSelector(selectSettings);
   const { fontSize, fontFamily, documentSize, autoFitOnePage } = settings;
-  const themeColor = settings.themeColor || DEFAULT_THEME_COLOR;
+  const themeColor = normalizeThemeColor(settings.themeColor);
+  const [themeColorDraft, setThemeColorDraft] = useState(themeColor);
   const dispatch = useAppDispatch();
   const { effectiveLayout, fitStatus, isComputing } = useAutoFitContext();
-  const baseFontSizePt = getBaseBodyFontSizePt(fontSize);
+  const parsedFontSize = Number(fontSize);
+  const chosenFontSizePt = getBaseBodyFontSizePt(fontSize, {
+    maxBodyFontSizePt: MAX_MANUAL_BODY_FONT_SIZE_PT,
+  });
+  const chosenFontSizeDisplay = formatFontSizePt(chosenFontSizePt);
   const effectiveFontSizePt = effectiveLayout.bodyFontSizePt;
   const effectiveFontSizeDisplay = formatFontSizePt(effectiveFontSizePt);
-  const baseFontSizeDisplay = formatFontSizePt(baseFontSizePt);
   const hasAdjustedFontSize =
-    Math.abs(effectiveFontSizePt - baseFontSizePt) >= 0.05;
+    Math.abs(effectiveFontSizePt - chosenFontSizePt) >= 0.05;
   const displayedFontSize = autoFitOnePage
     ? effectiveFontSizeDisplay
     : fontSize;
   const fontSizeLabel = autoFitOnePage
     ? "Applied Font Size (pt)"
     : "Font Size (pt)";
+  const atsReferenceFontSizePt = autoFitOnePage
+    ? effectiveFontSizePt
+    : chosenFontSizePt;
+  const atsReferenceFontSizeDisplay = formatFontSizePt(atsReferenceFontSizePt);
+  const isOutsideRecommendedAtsRange =
+    atsReferenceFontSizePt < MIN_BODY_FONT_SIZE_PT ||
+    atsReferenceFontSizePt > MAX_BODY_FONT_SIZE_PT;
+
+  useEffect(() => {
+    if (
+      Number.isFinite(parsedFontSize) &&
+      parsedFontSize > MAX_MANUAL_BODY_FONT_SIZE_PT
+    ) {
+      dispatch(
+        changeSettings({
+          field: "fontSize",
+          value: chosenFontSizeDisplay,
+        })
+      );
+    }
+  }, [chosenFontSizeDisplay, dispatch, parsedFontSize]);
+
+  useEffect(() => {
+    setThemeColorDraft(themeColor);
+  }, [themeColor]);
 
   const handleSettingsChange = (field: GeneralSetting, value: string) => {
     const normalizedValue =
@@ -68,33 +110,44 @@ export const ThemeForm = () => {
     dispatch(changeSettings({ field, value: normalizedValue }));
   };
 
+  const handleThemeColorChange = (value: string) => {
+    dispatch(
+      changeSettings({
+        field: "themeColor",
+        value: normalizeThemeColor(value).toLowerCase(),
+      })
+    );
+  };
+
+  const handleThemeColorDraftCommit = () => {
+    if (HEX_COLOR_PATTERN.test(themeColorDraft)) {
+      handleThemeColorChange(themeColorDraft);
+    } else {
+      setThemeColorDraft(themeColor);
+    }
+  };
+
   const handleAutoFitToggle = (checked: boolean) => {
     dispatch(changeAutoFitOnePage(checked));
   };
 
-  const autoFitMessage = !autoFitOnePage
+  const autoFitStatusText = !autoFitOnePage
     ? null
     : isComputing
-      ? "Calculating best one-page layout..."
+      ? "Finding the largest font size that still fits on one page..."
       : fitStatus === "overflowAtLimit"
-        ? "Content is too long to fit one page within ATS-safe limits."
+        ? `Even at ${effectiveFontSizeDisplay}pt, the resume is still longer than one page. Shorten the content to keep it to one page.`
         : fitStatus === "error"
-          ? "Auto-fit is temporarily unavailable."
+          ? `Auto-fit could not measure the PDF. Using your chosen size of ${chosenFontSizeDisplay}pt.`
           : hasAdjustedFontSize
-            ? `Auto-fit applied. Effective body font size: ${effectiveFontSizeDisplay}pt (base ${baseFontSizeDisplay}pt).`
-            : `Auto-fit is on. The current base size of ${effectiveFontSizeDisplay}pt already fits on one page.`;
+            ? `One-page fit found at ${effectiveFontSizeDisplay}pt.`
+            : `Already fits on one page at ${effectiveFontSizeDisplay}pt.`;
 
-  const fontSizeHelperText = !autoFitOnePage
-    ? null
-    : isComputing
-      ? `Base size is ${baseFontSizeDisplay}pt. Measuring the best one-page layout now.`
-      : fitStatus === "overflowAtLimit"
-        ? `Auto-fit reached the minimum readable size of ${effectiveFontSizeDisplay}pt and kept all content.`
-        : fitStatus === "error"
-          ? `Auto-fit could not calculate a fitted layout. The resume is using the base size of ${baseFontSizeDisplay}pt.`
-          : hasAdjustedFontSize
-            ? `Base size ${baseFontSizeDisplay}pt -> applied size ${effectiveFontSizeDisplay}pt.`
-            : `Auto-fit kept the applied size at ${effectiveFontSizeDisplay}pt because the current layout already fits on one page.`;
+  const atsFontSizeWarning = isOutsideRecommendedAtsRange
+    ? atsReferenceFontSizePt < MIN_BODY_FONT_SIZE_PT
+      ? `Warning: The fitted size is ${atsReferenceFontSizeDisplay}pt, below the recommended ATS range of ${RECOMMENDED_ATS_FONT_SIZE_RANGE_LABEL}.`
+      : `Warning: ${atsReferenceFontSizeDisplay}pt is above the recommended ATS range of ${RECOMMENDED_ATS_FONT_SIZE_RANGE_LABEL}.`
+    : null;
 
   return (
     <BaseForm>
@@ -106,30 +159,53 @@ export const ThemeForm = () => {
           </h1>
         </div>
         <div>
-          <InlineInput
-            label="Theme Color"
-            name="themeColor"
-            value={settings.themeColor}
-            placeholder={DEFAULT_THEME_COLOR}
-            onChange={handleSettingsChange}
-            inputStyle={{ color: themeColor }}
-          />
-          <div className="mt-2 flex flex-wrap gap-2">
-            {THEME_COLORS.map((color, idx) => (
-              <div
-                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-sm text-white"
-                style={{ backgroundColor: color }}
-                key={idx}
-                onClick={() => handleSettingsChange("themeColor", color)}
-                onKeyDown={(e) => {
-                  if (["Enter", " "].includes(e.key))
-                    handleSettingsChange("themeColor", color);
-                }}
-                tabIndex={0}
-              >
-                {settings.themeColor === color ? "✓" : ""}
+          <InputGroupWrapper label="Theme Color" />
+          <div className="mt-2 flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-3.5 py-2.5">
+            <label className="relative block h-[50px] w-[50px] shrink-0 cursor-pointer">
+              <span
+                className="absolute inset-0 rounded-full border-[3px] border-white shadow-[0_10px_24px_rgba(15,23,42,0.14)] ring-1 ring-gray-200"
+                style={{ backgroundColor: themeColor }}
+              />
+              <input
+                type="color"
+                aria-label="Choose theme color"
+                value={themeColor}
+                onChange={(e) => handleThemeColorChange(e.target.value)}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+            </label>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-gray-900">
+                Accent Color
               </div>
-            ))}
+              <div className="mt-1 flex flex-wrap items-center gap-3">
+                <input
+                  type="text"
+                  inputMode="text"
+                  aria-label="Theme color hex"
+                  value={themeColorDraft.toUpperCase()}
+                  onChange={(e) => setThemeColorDraft(e.target.value)}
+                  onBlur={handleThemeColorDraftCommit}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleThemeColorDraftCommit();
+                    }
+                    if (e.key === "Escape") {
+                      setThemeColorDraft(themeColor);
+                    }
+                  }}
+                  className="w-28 rounded-full bg-white px-3 py-1 text-sm font-semibold tracking-wide text-gray-700 ring-1 ring-gray-200 outline-none transition focus:ring-2 focus:ring-gray-300"
+                />
+                <button
+                  type="button"
+                  className="text-sm font-medium text-gray-500 underline-offset-4 hover:text-gray-700 hover:underline disabled:cursor-default disabled:no-underline disabled:opacity-50"
+                  onClick={() => handleThemeColorChange(DEFAULT_THEME_COLOR)}
+                  disabled={themeColor === DEFAULT_THEME_COLOR}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div>
@@ -149,28 +225,14 @@ export const ThemeForm = () => {
             readOnly={autoFitOnePage}
             onChange={handleSettingsChange}
           />
-          {autoFitOnePage && (
-            <p className="mt-2 text-sm text-gray-500">
-              Base size preset: {baseFontSizeDisplay}pt. Auto-fit applies the
-              actual size shown above to the PDF content.
-            </p>
-          )}
           <FontSizeSelections
             fontFamily={fontFamily as FontFamily}
             themeColor={themeColor}
             selectedFontSize={fontSize}
             handleSettingsChange={handleSettingsChange}
           />
-          {fontSizeHelperText && (
-            <p
-              className={`mt-2 text-sm ${
-                fitStatus === "overflowAtLimit" || fitStatus === "error"
-                  ? "text-amber-700"
-                  : "text-gray-500"
-              }`}
-            >
-              {fontSizeHelperText}
-            </p>
+          {atsFontSizeWarning && (
+            <p className="mt-2 text-sm text-amber-700">{atsFontSizeWarning}</p>
           )}
         </div>
         <div>
@@ -192,7 +254,7 @@ export const ThemeForm = () => {
             />
             <span className="font-medium">Auto fit to 1 page</span>
           </label>
-          {autoFitMessage && (
+          {autoFitStatusText && (
             <p
               className={`mt-2 text-sm ${
                 fitStatus === "overflowAtLimit" || fitStatus === "error"
@@ -200,7 +262,7 @@ export const ThemeForm = () => {
                   : "text-gray-500"
               }`}
             >
-              {autoFitMessage}
+              {autoFitStatusText}
             </p>
           )}
         </div>

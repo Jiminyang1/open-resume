@@ -2,6 +2,7 @@ import {
   buildResumeLayout,
   getBaseBodyFontSizePt,
   MAX_BODY_FONT_SIZE_PT,
+  MAX_MANUAL_BODY_FONT_SIZE_PT,
   MIN_BODY_FONT_SIZE_PT,
 } from "components/Resume/ResumePDF/layout";
 
@@ -32,7 +33,7 @@ describe("buildResumeLayout", () => {
       enforceAtsBoundaries: true,
     });
 
-    expect(compactLayout.bodyFontSizePt).toBe(MIN_BODY_FONT_SIZE_PT);
+    expect(compactLayout.bodyFontSizePt).toBe(8.4);
     expect(compactLayout.pagePaddingTopPt).toBe(5);
     expect(compactLayout.pagePaddingBottomPt).toBe(22);
     expect(compactLayout.autoFitBottomReservePt).toBe(8);
@@ -40,7 +41,7 @@ describe("buildResumeLayout", () => {
     expect(compactLayout.sectionGapPt).toBe(4);
     expect(compactLayout.lineHeight).toBe(1.18);
 
-    expect(expandedLayout.bodyFontSizePt).toBe(MAX_BODY_FONT_SIZE_PT);
+    expect(expandedLayout.bodyFontSizePt).toBe(12.8);
     expect(expandedLayout.pagePaddingTopPt).toBe(9.6);
     expect(expandedLayout.pagePaddingBottomPt).toBe(32);
     expect(expandedLayout.autoFitBottomReservePt).toBe(8);
@@ -49,10 +50,34 @@ describe("buildResumeLayout", () => {
     expect(expandedLayout.iconSizePt).toBe(14.5);
   });
 
-  it("caps oversized manual font sizes before rendering the page", () => {
-    expect(getBaseBodyFontSizePt("999")).toBe(MAX_BODY_FONT_SIZE_PT);
+  it("preserves larger manual font sizes when auto-fit is off", () => {
+    expect(buildResumeLayout({ fontSize: "18" }).bodyFontSizePt).toBe(18);
+  });
+
+  it("caps absurd manual font sizes before rendering the page", () => {
+    expect(
+      getBaseBodyFontSizePt("999", {
+        maxBodyFontSizePt: MAX_MANUAL_BODY_FONT_SIZE_PT,
+      })
+    ).toBe(MAX_MANUAL_BODY_FONT_SIZE_PT);
     expect(buildResumeLayout({ fontSize: "999" }).bodyFontSizePt).toBe(
-      MAX_BODY_FONT_SIZE_PT
+      MAX_MANUAL_BODY_FONT_SIZE_PT
     );
+  });
+
+  it("preserves the chosen auto-fit starting size while the ATS range stays available for warnings", () => {
+    expect(buildResumeLayout({
+      fontSize: "18",
+      enforceAtsBoundaries: true,
+    }).bodyFontSizePt).toBe(18);
+
+    expect(
+      getBaseBodyFontSizePt("18", {
+        maxBodyFontSizePt: MAX_MANUAL_BODY_FONT_SIZE_PT,
+      })
+    ).toBe(18);
+
+    expect(MIN_BODY_FONT_SIZE_PT).toBe(9.5);
+    expect(MAX_BODY_FONT_SIZE_PT).toBe(12);
   });
 });

@@ -47,8 +47,19 @@ describe("auto-fit search", () => {
     });
   });
 
+  it("continues fitting below the recommended ATS floor when needed", async () => {
+    const result = await findBestFitScale({
+      ...getAutoFitScaleBounds(),
+      measurePageCount: async (scale) => (scale <= 0.782 ? 1 : 2),
+    });
+
+    expect(result.fitStatus).toBe("applied");
+    expect(result.scale).toBeLessThan(0.79);
+    expect(result.scale).toBeGreaterThanOrEqual(0.75);
+  });
+
   it("keeps the base scale when the current layout already fits on one page", async () => {
-    const bounds = getAutoFitScaleBounds(8);
+    const bounds = getAutoFitScaleBounds();
     const result = await findBestFitScale({
       ...bounds,
       measurePageCount: async () => 1,
@@ -56,5 +67,12 @@ describe("auto-fit search", () => {
 
     expect(result.fitStatus).toBe("applied");
     expect(result.scale).toBe(1);
+  });
+
+  it("searches from the shared minimum layout scale instead of the ATS warning threshold", () => {
+    expect(getAutoFitScaleBounds()).toEqual({
+      minScale: 0.75,
+      maxScale: 1,
+    });
   });
 });
