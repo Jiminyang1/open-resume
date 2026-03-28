@@ -70,7 +70,12 @@ const createDefaultResume = (): Resume => ({
 });
 
 const createDefaultSettings = (): Settings => ({
-  themeColor: "#38bdf8",
+  themeColor: "#171717",
+  themeColorTargets: {
+    banner: false,
+    name: false,
+    sectionHeadings: false,
+  },
   fontFamily: "Roboto",
   fontSize: "11",
   documentSize: "Letter",

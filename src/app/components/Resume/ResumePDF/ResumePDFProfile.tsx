@@ -15,12 +15,12 @@ import type { ResumeProfile } from "lib/redux/types";
 export const ResumePDFProfile = ({
   layout,
   profile,
-  themeColor,
+  nameColor,
   isPDF,
 }: {
   layout: ResumeLayout;
   profile: ResumeProfile;
-  themeColor: string;
+  nameColor?: string;
   isPDF: boolean;
 }) => {
   const { name, email, phone, url, summary, location } = profile;
@@ -33,7 +33,7 @@ export const ResumePDFProfile = ({
     >
       <ResumePDFText
         bold={true}
-        themeColor={themeColor}
+        themeColor={nameColor}
         style={{ fontSize: toPt(layout.nameFontSizePt) }}
       >
         {name}

@@ -13,17 +13,20 @@ export const ResumePDFEducation = ({
   educations,
   layout,
   themeColor,
+  headingColor,
   showBulletPoints,
 }: {
   heading: string;
   educations: ResumeEducation[];
   layout: ResumeLayout;
   themeColor: string;
+  headingColor?: string;
   showBulletPoints: boolean;
 }) => {
   return (
     <ResumePDFSection
       themeColor={themeColor}
+      headingColor={headingColor}
       heading={heading}
       layout={layout}
     >

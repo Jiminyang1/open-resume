@@ -13,15 +13,18 @@ export const ResumePDFWorkExperience = ({
   layout,
   workExperiences,
   themeColor,
+  headingColor,
 }: {
   heading: string;
   layout: ResumeLayout;
   workExperiences: ResumeWorkExperience[];
   themeColor: string;
+  headingColor?: string;
 }) => {
   return (
     <ResumePDFSection
       themeColor={themeColor}
+      headingColor={headingColor}
       heading={heading}
       layout={layout}
     >

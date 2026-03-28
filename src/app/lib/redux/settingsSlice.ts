@@ -3,6 +3,11 @@ import type { RootState } from "lib/redux/store";
 
 export interface Settings {
   themeColor: string;
+  themeColorTargets: {
+    banner: boolean;
+    name: boolean;
+    sectionHeadings: boolean;
+  };
   fontFamily: string;
   fontSize: string;
   documentSize: string;
@@ -32,22 +37,29 @@ export interface Settings {
 
 export type ShowForm = keyof Settings["formToShow"];
 export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
+export type ThemeColorTarget = keyof Settings["themeColorTargets"];
 export type GeneralSetting = Exclude<
   keyof Settings,
   | "autoFitOnePage"
+  | "themeColorTargets"
   | "formToShow"
   | "formToHeading"
   | "formsOrder"
   | "showBulletPoints"
 >;
 
-export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
+export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
+export const DEFAULT_THEME_COLOR = DEFAULT_FONT_COLOR;
 export const DEFAULT_FONT_FAMILY = "Roboto";
 export const DEFAULT_FONT_SIZE = "11"; // text-base https://tailwindcss.com/docs/font-size
-export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
 
 export const initialSettings: Settings = {
   themeColor: DEFAULT_THEME_COLOR,
+  themeColorTargets: {
+    banner: false,
+    name: false,
+    sectionHeadings: false,
+  },
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
   documentSize: "Letter",
@@ -88,6 +100,13 @@ export const settingsSlice = createSlice({
     },
     changeAutoFitOnePage: (draft, action: PayloadAction<boolean>) => {
       draft.autoFitOnePage = action.payload;
+    },
+    changeThemeColorTarget: (
+      draft,
+      action: PayloadAction<{ field: ThemeColorTarget; value: boolean }>
+    ) => {
+      const { field, value } = action.payload;
+      draft.themeColorTargets[field] = value;
     },
     changeShowForm: (
       draft,
@@ -139,6 +158,7 @@ export const settingsSlice = createSlice({
 export const {
   changeSettings,
   changeAutoFitOnePage,
+  changeThemeColorTarget,
   changeShowForm,
   changeFormHeading,
   changeFormOrder,

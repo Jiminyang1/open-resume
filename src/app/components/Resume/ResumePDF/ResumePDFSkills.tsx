@@ -12,12 +12,14 @@ export const ResumePDFSkills = ({
   layout,
   skills,
   themeColor,
+  headingColor,
   showBulletPoints,
 }: {
   heading: string;
   layout: ResumeLayout;
   skills: ResumeSkills;
   themeColor: string;
+  headingColor?: string;
   showBulletPoints: boolean;
 }) => {
   const { descriptions } = skills;
@@ -25,6 +27,7 @@ export const ResumePDFSkills = ({
   return (
     <ResumePDFSection
       themeColor={themeColor}
+      headingColor={headingColor}
       heading={heading}
       layout={layout}
     >

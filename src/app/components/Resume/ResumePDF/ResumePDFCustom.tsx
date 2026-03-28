@@ -12,12 +12,14 @@ export const ResumePDFCustom = ({
   custom,
   layout,
   themeColor,
+  headingColor,
   showBulletPoints,
 }: {
   heading: string;
   custom: ResumeCustom;
   layout: ResumeLayout;
   themeColor: string;
+  headingColor?: string;
   showBulletPoints: boolean;
 }) => {
   const { descriptions } = custom;
@@ -25,6 +27,7 @@ export const ResumePDFCustom = ({
   return (
     <ResumePDFSection
       themeColor={themeColor}
+      headingColor={headingColor}
       heading={heading}
       layout={layout}
     >

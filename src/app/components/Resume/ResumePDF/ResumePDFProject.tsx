@@ -13,15 +13,18 @@ export const ResumePDFProject = ({
   layout,
   projects,
   themeColor,
+  headingColor,
 }: {
   heading: string;
   layout: ResumeLayout;
   projects: ResumeProject[];
   themeColor: string;
+  headingColor?: string;
 }) => {
   return (
     <ResumePDFSection
       themeColor={themeColor}
+      headingColor={headingColor}
       heading={heading}
       layout={layout}
     >

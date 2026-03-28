@@ -11,7 +11,10 @@ import { ResumePDFEducation } from "components/Resume/ResumePDF/ResumePDFEducati
 import { ResumePDFProject } from "components/Resume/ResumePDF/ResumePDFProject";
 import { ResumePDFSkills } from "components/Resume/ResumePDF/ResumePDFSkills";
 import { ResumePDFCustom } from "components/Resume/ResumePDF/ResumePDFCustom";
-import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
+import {
+  DEFAULT_FONT_COLOR,
+  DEFAULT_THEME_COLOR,
+} from "lib/redux/settingsSlice";
 import type { Settings, ShowForm } from "lib/redux/settingsSlice";
 import {
   getVisibleResumeEntries,
@@ -58,7 +61,14 @@ export const ResumePDF = ({
     formsOrder,
     showBulletPoints,
   } = settings;
-  const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
+  const themeColor = settings.themeColor || DEFAULT_THEME_COLOR;
+  const accentColor = settings.themeColorTargets?.banner
+    ? themeColor
+    : DEFAULT_FONT_COLOR;
+  const nameColor = settings.themeColorTargets?.name ? themeColor : undefined;
+  const headingColor = settings.themeColorTargets?.sectionHeadings
+    ? themeColor
+    : undefined;
   const resolvedLayout = layout ?? buildResumeLayout({ fontSize });
   const visibleWorkExperiences = getVisibleResumeEntries(workExperiences);
   const visibleEducations = getVisibleResumeEntries(educations);
@@ -83,34 +93,38 @@ export const ResumePDF = ({
     workExperiences: () => (
       <ResumePDFWorkExperience
         heading={formToHeading["workExperiences"]}
+        headingColor={headingColor}
         layout={resolvedLayout}
         workExperiences={visibleWorkExperiences}
-        themeColor={themeColor}
+        themeColor={accentColor}
       />
     ),
     educations: () => (
       <ResumePDFEducation
         heading={formToHeading["educations"]}
         educations={visibleEducations}
+        headingColor={headingColor}
         layout={resolvedLayout}
-        themeColor={themeColor}
+        themeColor={accentColor}
         showBulletPoints={showBulletPoints["educations"]}
       />
     ),
     projects: () => (
       <ResumePDFProject
         heading={formToHeading["projects"]}
+        headingColor={headingColor}
         layout={resolvedLayout}
         projects={visibleProjects}
-        themeColor={themeColor}
+        themeColor={accentColor}
       />
     ),
     skills: () => (
       <ResumePDFSkills
         heading={formToHeading["skills"]}
+        headingColor={headingColor}
         layout={resolvedLayout}
         skills={skills}
-        themeColor={themeColor}
+        themeColor={accentColor}
         showBulletPoints={showBulletPoints["skills"]}
       />
     ),
@@ -118,8 +132,9 @@ export const ResumePDF = ({
       <ResumePDFCustom
         heading={formToHeading["custom"]}
         custom={custom}
+        headingColor={headingColor}
         layout={resolvedLayout}
-        themeColor={themeColor}
+        themeColor={accentColor}
         showBulletPoints={showBulletPoints["custom"]}
       />
     ),
@@ -137,12 +152,12 @@ export const ResumePDF = ({
             fontSize: toPt(resolvedLayout.bodyFontSizePt),
           }}
         >
-          {Boolean(settings.themeColor) && (
+          {Boolean(accentColor) && (
             <View
               style={{
                 width: spacing["full"],
                 height: toPt(resolvedLayout.topAccentHeightPt),
-                backgroundColor: themeColor,
+                backgroundColor: accentColor,
               }}
             />
           )}
@@ -160,7 +175,7 @@ export const ResumePDF = ({
             <ResumePDFProfile
               layout={resolvedLayout}
               profile={profile}
-              themeColor={themeColor}
+              nameColor={nameColor}
               isPDF={isPDF}
             />
             {showFormsOrder.map((form) => {

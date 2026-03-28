@@ -117,7 +117,7 @@ export const ResumeManagerDownloadButton = ({
     <button
       type="button"
       className={cx(
-        "outline-theme-blue inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700",
+        "outline-theme-blue inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-gray-300 px-4 text-sm font-semibold text-gray-700",
         className
       )}
       onClick={onDownload}

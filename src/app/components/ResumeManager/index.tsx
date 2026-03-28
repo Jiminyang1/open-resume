@@ -42,7 +42,7 @@ const ResumeManagerDownloadButton = dynamic<ResumeManagerDownloadButtonProps>(
   {
     ssr: false,
     loading: () => (
-      <div className="rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-400">
+      <div className="inline-flex h-10 items-center justify-center rounded-full border border-gray-300 px-4 text-sm font-semibold text-gray-400">
         Download
       </div>
     ),
@@ -82,6 +82,15 @@ const sourceToLabel = {
   scratch: "Started here",
   imported: "Imported PDF",
 } as const;
+
+const resumeCardActionButtonClassName =
+  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-semibold";
+
+const resumeCardSecondaryActionButtonClassName =
+  "outline-theme-blue inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-gray-300 px-4 text-sm font-semibold text-gray-700";
+
+const resumeCardDangerActionButtonClassName =
+  "outline-theme-blue inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-red-200 px-4 text-sm font-semibold text-red-600";
 
 export const ResumeManager = () => {
   const router = useRouter();
@@ -254,10 +263,10 @@ export const ResumeManager = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-3 lg:max-w-sm lg:justify-end">
+                      <div className="flex flex-wrap items-center gap-2.5 sm:flex-nowrap lg:shrink-0">
                         <button
                           type="button"
-                          className="btn-primary inline-flex items-center gap-2"
+                          className={`${resumeCardActionButtonClassName} bg-primary outline-theme-purple shadow-sm`}
                           onClick={() => onOpenResume(savedResume.id)}
                         >
                           <PencilSquareIcon className="h-4 w-4" />
@@ -266,7 +275,7 @@ export const ResumeManager = () => {
                         <ResumeManagerDownloadButton savedResume={savedResume} />
                         <button
                           type="button"
-                          className="outline-theme-blue inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
+                          className={resumeCardSecondaryActionButtonClassName}
                           onClick={() => onDuplicateResume(savedResume.id)}
                         >
                           <DocumentDuplicateIcon className="h-4 w-4" />
@@ -274,7 +283,7 @@ export const ResumeManager = () => {
                         </button>
                         <button
                           type="button"
-                          className="outline-theme-blue inline-flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600"
+                          className={resumeCardDangerActionButtonClassName}
                           onClick={() => onDeleteResume(savedResume)}
                         >
                           <TrashIcon className="h-4 w-4" />

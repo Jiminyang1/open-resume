@@ -11,12 +11,14 @@ import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 
 export const ResumePDFSection = ({
   themeColor,
+  headingColor,
   heading,
   layout,
   style = {},
   children,
 }: {
   themeColor?: string;
+  headingColor?: string;
   heading?: string;
   layout: ResumeLayout;
   style?: Style;
@@ -45,6 +47,7 @@ export const ResumePDFSection = ({
         ) : null}
         <Text
           style={{
+            color: headingColor || DEFAULT_FONT_COLOR,
             fontWeight: "bold",
             letterSpacing: toPt(layout.headingLetterSpacingPt),
           }}

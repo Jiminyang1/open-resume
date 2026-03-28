@@ -16,10 +16,12 @@ import {
 } from "components/ResumeForm/ThemeForm/Selection";
 import {
   changeAutoFitOnePage,
+  changeThemeColorTarget,
   changeSettings,
   DEFAULT_THEME_COLOR,
   selectSettings,
   type GeneralSetting,
+  type ThemeColorTarget,
 } from "lib/redux/settingsSlice";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import type { FontFamily } from "components/fonts/constants";
@@ -56,9 +58,33 @@ const normalizeFontSizeInput = (value: string) => {
     : value;
 };
 
+const themeColorTargetOptions: {
+  target: ThemeColorTarget;
+  label: string;
+}[] = [
+  {
+    target: "banner",
+    label: "Banner",
+  },
+  {
+    target: "name",
+    label: "Name",
+  },
+  {
+    target: "sectionHeadings",
+    label: "Section Titles",
+  },
+];
+
 export const ThemeForm = () => {
   const settings = useAppSelector(selectSettings);
-  const { fontSize, fontFamily, documentSize, autoFitOnePage } = settings;
+  const {
+    fontSize,
+    fontFamily,
+    documentSize,
+    autoFitOnePage,
+    themeColorTargets,
+  } = settings;
   const themeColor = normalizeThemeColor(settings.themeColor);
   const [themeColorDraft, setThemeColorDraft] = useState(themeColor);
   const dispatch = useAppDispatch();
@@ -125,6 +151,13 @@ export const ThemeForm = () => {
     } else {
       setThemeColorDraft(themeColor);
     }
+  };
+
+  const handleThemeColorTargetChange = (
+    field: ThemeColorTarget,
+    value: boolean
+  ) => {
+    dispatch(changeThemeColorTarget({ field, value }));
   };
 
   const handleAutoFitToggle = (checked: boolean) => {
@@ -205,6 +238,41 @@ export const ThemeForm = () => {
                   Reset
                 </button>
               </div>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+              Apply To
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {themeColorTargetOptions.map(({ target, label }) => {
+                const isSelected = themeColorTargets[target];
+
+                return (
+                  <button
+                    key={target}
+                    type="button"
+                    aria-pressed={isSelected}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
+                      isSelected
+                        ? "border-transparent text-white shadow-sm"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                    style={
+                      isSelected
+                        ? {
+                            backgroundColor: themeColor,
+                          }
+                        : undefined
+                    }
+                    onClick={() =>
+                      handleThemeColorTargetChange(target, !isSelected)
+                    }
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

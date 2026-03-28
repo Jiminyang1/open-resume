@@ -53,7 +53,12 @@ const initialResumeState = {
 };
 
 const initialSettings = {
-  themeColor: "#38bdf8",
+  themeColor: "#171717",
+  themeColorTargets: {
+    banner: false,
+    name: false,
+    sectionHeadings: false,
+  },
   fontFamily: "Roboto",
   fontSize: "11",
   documentSize: "Letter",
@@ -138,6 +143,12 @@ describe("local storage resume manager", () => {
       settings: savedResume.settings,
     });
     expect(savedResume.title).toBe("Untitled Resume");
+    expect(savedResume.settings.themeColor).toBe("#171717");
+    expect(savedResume.settings.themeColorTargets).toEqual({
+      banner: false,
+      name: false,
+      sectionHeadings: false,
+    });
   });
 
   it("syncs builder edits back into the currently selected saved resume", () => {
