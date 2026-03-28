@@ -28,6 +28,8 @@ import {
   moveSectionInForm,
 } from "lib/redux/resumeSlice";
 
+type RepeatableForm = Exclude<ShowForm, "skills" | "custom">;
+
 /**
  * BaseForm is the bare bone form, i.e. just the outline with no title and no control buttons.
  * ProfileForm uses this to compose its outline.
@@ -136,14 +138,18 @@ export const Form = ({
 export const FormSection = ({
   form,
   idx,
+  visible = true,
+  setVisible,
   showMoveUp,
   showMoveDown,
   showDelete,
   deleteButtonTooltipText,
   children,
 }: {
-  form: ShowForm;
+  form: RepeatableForm;
   idx: number;
+  visible?: boolean;
+  setVisible?: (visible: boolean) => void;
   showMoveUp: boolean;
   showMoveDown: boolean;
   showDelete: boolean;
@@ -163,9 +169,26 @@ export const FormSection = ({
       {idx !== 0 && (
         <div className="mb-4 mt-6 border-t-2 border-dotted border-gray-200" />
       )}
-      <div className="relative grid grid-cols-6 gap-3">
+      <div
+        className={`relative grid grid-cols-6 gap-3 transition-opacity duration-200 ${
+          visible ? "" : "opacity-60"
+        }`}
+      >
         {children}
+        {!visible && (
+          <p className="col-span-full text-sm text-amber-700">
+            Hidden from the resume preview and PDF export.
+          </p>
+        )}
         <div className={`absolute right-0 top-0 flex gap-0.5 `}>
+          {setVisible && (
+            <ShowIconButton
+              show={visible}
+              setShow={setVisible}
+              size="small"
+              targetLabel="entry"
+            />
+          )}
           <div
             className={`transition-all duration-300 ${
               showMoveUp ? "" : "invisible opacity-0"

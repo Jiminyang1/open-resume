@@ -13,6 +13,10 @@ import { ResumePDFSkills } from "components/Resume/ResumePDF/ResumePDFSkills";
 import { ResumePDFCustom } from "components/Resume/ResumePDF/ResumePDFCustom";
 import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 import type { Settings, ShowForm } from "lib/redux/settingsSlice";
+import {
+  getVisibleResumeEntries,
+  hasVisibleResumeEntries,
+} from "lib/redux/resume-visibility";
 import type { Resume } from "lib/redux/types";
 import { SuppressResumePDFErrorMessage } from "components/Resume/ResumePDF/common/SuppressResumePDFErrorMessage";
 
@@ -56,22 +60,38 @@ export const ResumePDF = ({
   } = settings;
   const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
   const resolvedLayout = layout ?? buildResumeLayout({ fontSize });
+  const visibleWorkExperiences = getVisibleResumeEntries(workExperiences);
+  const visibleEducations = getVisibleResumeEntries(educations);
+  const visibleProjects = getVisibleResumeEntries(projects);
 
-  const showFormsOrder = formsOrder.filter((form) => formToShow[form]);
+  const showFormsOrder = formsOrder.filter((form) => {
+    if (!formToShow[form]) return false;
+
+    switch (form) {
+      case "workExperiences":
+        return hasVisibleResumeEntries(workExperiences);
+      case "educations":
+        return hasVisibleResumeEntries(educations);
+      case "projects":
+        return hasVisibleResumeEntries(projects);
+      default:
+        return true;
+    }
+  });
 
   const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
     workExperiences: () => (
       <ResumePDFWorkExperience
         heading={formToHeading["workExperiences"]}
         layout={resolvedLayout}
-        workExperiences={workExperiences}
+        workExperiences={visibleWorkExperiences}
         themeColor={themeColor}
       />
     ),
     educations: () => (
       <ResumePDFEducation
         heading={formToHeading["educations"]}
-        educations={educations}
+        educations={visibleEducations}
         layout={resolvedLayout}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["educations"]}
@@ -81,7 +101,7 @@ export const ResumePDF = ({
       <ResumePDFProject
         heading={formToHeading["projects"]}
         layout={resolvedLayout}
-        projects={projects}
+        projects={visibleProjects}
         themeColor={themeColor}
       />
     ),

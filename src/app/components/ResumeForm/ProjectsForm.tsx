@@ -5,7 +5,11 @@ import {
 } from "components/ResumeForm/Form/InputGroup";
 import type { CreateHandleChangeArgsWithDescriptions } from "components/ResumeForm/types";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
-import { selectProjects, changeProjects } from "lib/redux/resumeSlice";
+import {
+  changeProjects,
+  changeSectionVisibility,
+  selectProjects,
+} from "lib/redux/resumeSlice";
 import type { ResumeProject } from "lib/redux/types";
 
 export const ProjectsForm = () => {
@@ -15,7 +19,7 @@ export const ProjectsForm = () => {
 
   return (
     <Form form="projects" addButtonText="Add Project">
-      {projects.map(({ project, date, descriptions }, idx) => {
+      {projects.map(({ project, date, descriptions, visible }, idx) => {
         const handleProjectChange = (
           ...[
             field,
@@ -24,14 +28,20 @@ export const ProjectsForm = () => {
         ) => {
           dispatch(changeProjects({ idx, field, value } as any));
         };
+        const handleVisibilityChange = (value: boolean) => {
+          dispatch(changeSectionVisibility({ form: "projects", idx, value }));
+        };
         const showMoveUp = idx !== 0;
         const showMoveDown = idx !== projects.length - 1;
+        const isVisible = visible !== false;
 
         return (
           <FormSection
             key={idx}
             form="projects"
             idx={idx}
+            visible={isVisible}
+            setVisible={handleVisibilityChange}
             showMoveUp={showMoveUp}
             showMoveDown={showMoveDown}
             showDelete={showDelete}

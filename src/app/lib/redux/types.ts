@@ -8,6 +8,7 @@ export interface ResumeProfile {
 }
 
 export interface ResumeWorkExperience {
+  visible?: boolean;
   company: string;
   jobTitle: string;
   date: string;
@@ -15,6 +16,7 @@ export interface ResumeWorkExperience {
 }
 
 export interface ResumeEducation {
+  visible?: boolean;
   school: string;
   degree: string;
   date: string;
@@ -23,6 +25,7 @@ export interface ResumeEducation {
 }
 
 export interface ResumeProject {
+  visible?: boolean;
   project: string;
   date: string;
   descriptions: string[];

@@ -10,6 +10,8 @@ import type {
 } from "lib/redux/types";
 import type { ShowForm } from "lib/redux/settingsSlice";
 
+type RepeatableForm = Exclude<ShowForm, "skills" | "custom">;
+
 export const initialProfile: ResumeProfile = {
   name: "",
   summary: "",
@@ -20,6 +22,7 @@ export const initialProfile: ResumeProfile = {
 };
 
 export const initialWorkExperience: ResumeWorkExperience = {
+  visible: true,
   company: "",
   jobTitle: "",
   date: "",
@@ -27,6 +30,7 @@ export const initialWorkExperience: ResumeWorkExperience = {
 };
 
 export const initialEducation: ResumeEducation = {
+  visible: true,
   school: "",
   degree: "",
   gpa: "",
@@ -35,6 +39,7 @@ export const initialEducation: ResumeEducation = {
 };
 
 export const initialProject: ResumeProject = {
+  visible: true,
   project: "",
   date: "",
   descriptions: [],
@@ -62,7 +67,7 @@ export type CreateChangeActionWithDescriptions<T> = {
   idx: number;
 } & (
   | {
-      field: Exclude<keyof T, "descriptions">;
+      field: Exclude<keyof T, "descriptions" | "visible">;
       value: string;
     }
   | { field: "descriptions"; value: string[] }
@@ -139,38 +144,45 @@ export const resumeSlice = createSlice({
     moveSectionInForm: (
       draft,
       action: PayloadAction<{
-        form: ShowForm;
+        form: RepeatableForm;
         idx: number;
         direction: "up" | "down";
       }>
     ) => {
       const { form, idx, direction } = action.payload;
-      if (form !== "skills" && form !== "custom") {
-        if (
-          (idx === 0 && direction === "up") ||
-          (idx === draft[form].length - 1 && direction === "down")
-        ) {
-          return draft;
-        }
-
-        const section = draft[form][idx];
-        if (direction === "up") {
-          draft[form][idx] = draft[form][idx - 1];
-          draft[form][idx - 1] = section;
-        } else {
-          draft[form][idx] = draft[form][idx + 1];
-          draft[form][idx + 1] = section;
-        }
+      if (
+        (idx === 0 && direction === "up") ||
+        (idx === draft[form].length - 1 && direction === "down")
+      ) {
+        return draft;
       }
+
+      const section = draft[form][idx];
+      if (direction === "up") {
+        draft[form][idx] = draft[form][idx - 1];
+        draft[form][idx - 1] = section;
+      } else {
+        draft[form][idx] = draft[form][idx + 1];
+        draft[form][idx + 1] = section;
+      }
+    },
+    changeSectionVisibility: (
+      draft,
+      action: PayloadAction<{
+        form: RepeatableForm;
+        idx: number;
+        value: boolean;
+      }>
+    ) => {
+      const { form, idx, value } = action.payload;
+      draft[form][idx].visible = value;
     },
     deleteSectionInFormByIdx: (
       draft,
-      action: PayloadAction<{ form: ShowForm; idx: number }>
+      action: PayloadAction<{ form: RepeatableForm; idx: number }>
     ) => {
       const { form, idx } = action.payload;
-      if (form !== "skills" && form !== "custom") {
-        draft[form].splice(idx, 1);
-      }
+      draft[form].splice(idx, 1);
     },
     setResume: (draft, action: PayloadAction<Resume>) => {
       return action.payload;
@@ -187,6 +199,7 @@ export const {
   changeCustom,
   addSectionInForm,
   moveSectionInForm,
+  changeSectionVisibility,
   deleteSectionInFormByIdx,
   setResume,
 } = resumeSlice.actions;

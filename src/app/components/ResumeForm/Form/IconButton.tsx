@@ -11,19 +11,24 @@ import {
 export const ShowIconButton = ({
   show,
   setShow,
+  size = "medium",
+  targetLabel = "section",
 }: {
   show: boolean;
   setShow: (show: boolean) => void;
+  size?: "small" | "medium";
+  targetLabel?: string;
 }) => {
-  const tooltipText = show ? "Hide section" : "Show section";
+  const tooltipText = show ? `Hide ${targetLabel}` : `Show ${targetLabel}`;
   const onClick = () => {
     setShow(!show);
   };
   const Icon = show ? EyeIcon : EyeSlashIcon;
+  const sizeClassName = size === "medium" ? "h-6 w-6" : "h-4 w-4";
 
   return (
-    <IconButton onClick={onClick} tooltipText={tooltipText}>
-      <Icon className="h-6 w-6 text-gray-400" aria-hidden="true" />
+    <IconButton onClick={onClick} tooltipText={tooltipText} size={size}>
+      <Icon className={`${sizeClassName} text-gray-400`} aria-hidden="true" />
       <span className="sr-only">{tooltipText}</span>
     </IconButton>
   );
