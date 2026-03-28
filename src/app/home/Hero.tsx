@@ -7,23 +7,42 @@ export const Hero = () => {
     <section className="lg:flex lg:h-[825px] lg:justify-center">
       <FlexboxSpacer maxWidth={75} minWidth={0} className="hidden lg:block" />
       <div className="mx-auto max-w-xl pt-8 text-center lg:mx-0 lg:grow lg:pt-32 lg:text-left">
-        <h1 className="text-primary pb-2 text-4xl font-bold lg:text-5xl">
-          Create a professional
-          <br />
-          resume easily
-        </h1>
-        <p className="mt-3 text-lg lg:mt-5 lg:text-xl">
-          With this free, open-source, and powerful resume builder
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-gray-500">
+          Open-source continuation
         </p>
-        <Link href="/resumes" className="btn-primary mt-6 lg:mt-14">
-          Create Resume <span aria-hidden="true">→</span>
-        </Link>
-        <p className="ml-6 mt-3 text-sm text-gray-600">No sign up required</p>
-        <p className="mt-3 text-sm text-gray-600 lg:mt-36">
-          Already have a resume? Test its ATS readability with the{" "}
-          <Link href="/resume-parser" className="underline underline-offset-2">
-            resume parser
+        <h1 className="text-primary pb-2 pt-3 text-4xl font-bold lg:text-5xl">
+          Open Resume Plus
+        </h1>
+        <p className="mt-3 text-lg leading-8 lg:mt-5 lg:text-xl">
+          A more focused resume builder and parser, evolved from OpenResume and
+          refined into a cleaner product experience.
+        </p>
+        <p className="mt-4 text-sm leading-7 text-gray-600 lg:max-w-lg">
+          Build from scratch, import an existing resume, or test ATS readability
+          without adding clutter to the workflow.
+        </p>
+        <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row lg:mt-10 lg:items-start">
+          <Link href="/resumes" className="btn-primary">
+            Open Resume Library <span aria-hidden="true">→</span>
           </Link>
+          <Link
+            href="/resume-parser"
+            className="outline-theme-blue inline-block rounded-full border border-sky-200 px-6 py-2 font-semibold text-sky-700"
+          >
+            Try Resume Parser
+          </Link>
+        </div>
+        <p className="mt-5 text-sm leading-7 text-gray-600 lg:max-w-lg">
+          Built with respect for the original{" "}
+          <Link
+            href="https://github.com/xitanggg/open-resume"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium underline underline-offset-2"
+          >
+            OpenResume
+          </Link>{" "}
+          project and continued as an independent open-source product.
         </p>
       </div>
       <FlexboxSpacer maxWidth={100} minWidth={50} className="hidden lg:block" />

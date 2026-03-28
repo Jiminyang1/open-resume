@@ -1,8 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import logoSrc from "public/logo.svg";
 import { cx } from "lib/cx";
 
 export const TopNavBar = () => {
@@ -18,14 +16,16 @@ export const TopNavBar = () => {
       )}
     >
       <div className="flex h-10 w-full items-center justify-between">
-        <Link href="/">
-          <span className="sr-only">OpenResume</span>
-          <Image
-            src={logoSrc}
-            alt="OpenResume Logo"
-            className="h-8 w-full"
-            priority
-          />
+        <Link href="/" className="flex items-center gap-3">
+          <LogoMark />
+          <div className="leading-tight">
+            <div className="text-sm font-semibold text-gray-900 lg:text-base">
+              Open Resume Plus
+            </div>
+            <div className="hidden text-xs text-gray-500 sm:block">
+              Built on OpenResume
+            </div>
+          </div>
         </Link>
         <nav
           aria-label="Site Nav Bar"
@@ -44,17 +44,35 @@ export const TopNavBar = () => {
               {text}
             </Link>
           ))}
-          <div className="ml-1 mt-1">
-            <iframe
-              src="https://ghbtns.com/github-btn.html?user=xitanggg&repo=open-resume&type=star&count=true"
-              width="100"
-              height="20"
-              className="overflow-hidden border-none"
-              title="GitHub"
-            />
-          </div>
         </nav>
       </div>
     </header>
   );
 };
+
+const LogoMark = () => (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 40 47"
+    className="h-9 w-9 shrink-0"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M22 7V13.06C28.78 14.03 34 19.85 34 26.9C34 28.69 33.65 30.4 33.04 31.97L38.24 35.04C39.35 32.55 40 29.81 40 26.9C40 16.53 32.11 8.01 22 7ZM20 40.9C12.27 40.9 6 34.63 6 26.9C6 19.85 11.22 14.03 18 13.06V7C7.88 8 0 16.53 0 26.9C0 37.95 8.94 46.9 19.99 46.9C26.61 46.9 32.46 43.67 36.1 38.72L30.91 35.66C28.35 38.85 24.42 40.9 20 40.9Z"
+      fill="url(#open-resume-plus-logo-mark)"
+    />
+    <defs>
+      <linearGradient
+        id="open-resume-plus-logo-mark"
+        x1="40"
+        y1="7"
+        x2="-7.20049"
+        y2="19.3253"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#4FC5EB" />
+        <stop offset="1" stopColor="#5D52D9" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
