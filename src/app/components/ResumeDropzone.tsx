@@ -3,8 +3,8 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
 import {
+  createImportedResumeInLocalStorage,
   getHasUsedAppBefore,
-  saveStateToLocalStorage,
 } from "lib/redux/local-storage";
 import { type ShowForm, initialSettings } from "lib/redux/settingsSlice";
 import { useRouter } from "next/navigation";
@@ -19,19 +19,24 @@ const defaultFileState = {
   fileUrl: "",
 };
 
+export type ResumeDropzoneProps = {
+  onFileUrlChange: (fileUrl: string) => void;
+  className?: string;
+  playgroundView?: boolean;
+  compactView?: boolean;
+};
+
 export const ResumeDropzone = ({
   onFileUrlChange,
   className,
   playgroundView = false,
-}: {
-  onFileUrlChange: (fileUrl: string) => void;
-  className?: string;
-  playgroundView?: boolean;
-}) => {
+  compactView = false,
+}: ResumeDropzoneProps) => {
   const [file, setFile] = useState(defaultFileState);
   const [isHoveredOnDropzone, setIsHoveredOnDropzone] = useState(false);
   const [hasNonPdfFile, setHasNonPdfFile] = useState(false);
   const router = useRouter();
+  const isCompact = playgroundView || compactView;
 
   const hasFile = Boolean(file.name);
 
@@ -90,7 +95,11 @@ export const ResumeDropzone = ({
       }
     }
 
-    saveStateToLocalStorage({ resume, settings });
+    createImportedResumeInLocalStorage({
+      resume,
+      settings,
+      title: file.name.replace(/\.pdf$/i, ""),
+    });
     router.push("/resume-builder");
   };
 
@@ -99,7 +108,7 @@ export const ResumeDropzone = ({
       className={cx(
         "flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 ",
         isHoveredOnDropzone && "border-sky-400",
-        playgroundView ? "pb-6 pt-4" : "py-12",
+        isCompact ? "pb-5 pt-4" : "py-12",
         className
       )}
       onDragOver={(event) => {
@@ -112,13 +121,13 @@ export const ResumeDropzone = ({
       <div
         className={cx(
           "text-center",
-          playgroundView ? "space-y-2" : "space-y-3"
+          isCompact ? "space-y-2" : "space-y-3"
         )}
       >
         {!playgroundView && (
           <Image
             src={addPdfSrc}
-            className="mx-auto h-14 w-14"
+            className={cx("mx-auto", compactView ? "h-10 w-10" : "h-14 w-14")}
             alt="Add pdf"
             aria-hidden="true"
             priority
@@ -129,7 +138,11 @@ export const ResumeDropzone = ({
             <p
               className={cx(
                 "pt-3 text-gray-700",
-                !playgroundView && "text-lg font-semibold"
+                playgroundView
+                  ? ""
+                  : compactView
+                    ? "text-base font-semibold"
+                    : "text-lg font-semibold"
               )}
             >
               Browse a pdf file or drop it here
@@ -159,7 +172,8 @@ export const ResumeDropzone = ({
             <>
               <label
                 className={cx(
-                  "within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm",
+                  "within-outline-theme-purple cursor-pointer rounded-full font-semibold shadow-sm",
+                  compactView ? "px-5 pb-2 pt-1.5 text-sm" : "px-6 pb-2.5 pt-2",
                   playgroundView ? "border" : "bg-primary"
                 )}
               >
@@ -180,13 +194,22 @@ export const ResumeDropzone = ({
               {!playgroundView && (
                 <button
                   type="button"
-                  className="btn-primary"
+                  className={cx("btn-primary", compactView && "px-5 py-1.5 text-sm")}
                   onClick={onImportClick}
                 >
                   Import and Continue <span aria-hidden="true">→</span>
                 </button>
               )}
-              <p className={cx(" text-gray-500", !playgroundView && "mt-6")}>
+              <p
+                className={cx(
+                  "text-gray-500",
+                  playgroundView
+                    ? ""
+                    : compactView
+                      ? "mt-4 text-sm"
+                      : "mt-6"
+                )}
+              >
                 Note: {!playgroundView ? "Import" : "Parser"} works best on
                 single column resume
               </p>

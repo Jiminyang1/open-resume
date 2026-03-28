@@ -32,7 +32,8 @@ export default function ImportResume() {
                 <OrDivider />
                 <SectionWithHeadingAndCreateButton
                   heading="Don't have a resume yet?"
-                  buttonText="Create from scratch"
+                  buttonText="Open Resume Library"
+                  href="/resumes"
                 />
               </>
             )}
@@ -43,13 +44,14 @@ export default function ImportResume() {
               <>
                 <SectionWithHeadingAndCreateButton
                   heading="You have data saved in browser from prior session"
-                  buttonText="Continue where I left off"
+                  buttonText="Open Resume Library"
+                  href="/resumes"
                 />
                 <OrDivider />
               </>
             )}
             <h1 className="font-semibold text-gray-900">
-              Override data with a new resume
+              Import another resume into your library
             </h1>
             <ResumeDropzone
               onFileUrlChange={onFileUrlChange}
@@ -73,16 +75,18 @@ const OrDivider = () => (
 const SectionWithHeadingAndCreateButton = ({
   heading,
   buttonText,
+  href,
 }: {
   heading: string;
   buttonText: string;
+  href: string;
 }) => {
   return (
     <>
       <p className="font-semibold text-gray-900">{heading}</p>
       <div className="mt-5">
         <Link
-          href="/resume-builder"
+          href={href}
           className="outline-theme-blue rounded-full bg-sky-500 px-6 pb-2 pt-1.5 text-base font-semibold text-white"
         >
           {buttonText}
